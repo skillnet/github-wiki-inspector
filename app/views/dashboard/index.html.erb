@@ -1,0 +1,7 @@
+<p>Go <a href="http://github.com/">http://github.com/</a>, find a wiki page to inspect and paste url here.</p>
+
+<% form_tag({:action => "open_page"}, {:method => :get}) do %>
+  <label for="page_url">Page URL</label>
+  <%= text_field_tag "page_url", params["page_url"] %>
+  <%= submit_tag "Open" %>
+<% end %>

@@ -1,2 +1,14 @@
-<h1>Page#diff</h1>
-<p>Find me in app/views/page/diff.html.erb</p>
+<div id="tools">
+  <% form_tag({:action => "diff"}, {:method => :get}) do %>
+  <label for="page_url">Version</label>
+  <%= @page_versions_select %>
+  <%= submit_tag "Show changes" %>
+  <% end %>
+  Showing diff from <%= @v2 %> to <%= @v1==0 ? "current" : @v1 %> |
+  <%= link_to "Show current version", :version=>nil, :action=>:show %> |
+  <%= link_to "Dashboard", root_url %>
+</div>
+
+<div id="pageview">
+  <%= @diff %>
+</div>

@@ -1,0 +1,21 @@
+body {
+    font-face: Helvetica, sans-serif;
+}
+
+#pageview, #tools {
+    margin: 1em;
+    padding: 1em;
+    border: 1px solid gray;
+    color: black;
+    background-color: #EEE;
+}
+
+ins {
+    color: #060;
+    background-color: #8F8;
+}
+
+del {
+    color: #600;
+    background-color: #F88;
+}
