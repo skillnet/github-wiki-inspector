@@ -5,17 +5,21 @@ body {
 #pageview, #tools {
     margin: 1em;
     padding: 1em;
-    border: 1px solid gray;
+    border: 1px solid #BEDCE7;
     color: black;
-    background-color: #EEE;
+    background-color: #EAF2F5;
 }
 
-ins {
+ins, ins * {
     color: #060;
-    background-color: #8F8;
+    background-color: #AAFFAA;
 }
 
-del {
+del, del * {
     color: #600;
-    background-color: #F88;
+    background-color: #FFAAAA;
+}
+
+form {
+    margin: 0 0 1em 0;
 }
