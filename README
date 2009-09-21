@@ -1,2 +1,14 @@
 == GitHub Wiki Inspector
 Compact Rails WebApp to inspect various issues of GitHub Wiki pages.  Grab it, fire script/server, browse http://localhost:3000/ and start diffing.
+
+=== TODO
+* Handle homepages
+  http://wiki.github.com/foo/bar/home redirects to /foo/bar and
+  versions select list has /foo/bar/wikis/home
+* Temporal (next, prev) diff navigation
+* Move page handling to a model
+* Cache
+** loaded page contents
+** extracted page parts
+** calculated diffs
+* Page and wiki history
