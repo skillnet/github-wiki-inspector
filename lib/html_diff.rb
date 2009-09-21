@@ -1,3 +1,7 @@
+# Original
+# http://dev.rubyonrails.org/browser/tools/i2/vendor/html_diff/lib/html_diff.rb?rev=2294
+# Adapted by Tero Tilus <http://tero.tilus.net/>
+
 # heavily based off difflib.py - see that file for documentation
 # ported from Python by Bill Atkins
 
@@ -53,6 +57,10 @@ module Diff
       "\t" == char
     end
 
+    def whitespace?(char)
+      /^\s+$/ =~ char
+    end
+
     # XXX Could be more robust but unrecognized tags cause an infinite loop so
     # better to be permissive
     def open_tag?(char)
@@ -87,23 +95,30 @@ module Diff
           else
             cur += char
           end
-        when :char
+        when :char, :space
           if start_of_tag? char
             out.push cur
             cur  = use_brackets ? '[' : '<'
             mode = :tag
-          elsif /\s/.match char
-            out.push cur + char
-            cur = ''
           else
-            cur += char
+            if ((mode == :char) and (whitespace? char)) or
+                ((mode == :space) and (not whitespace? char))
+              # toggle mode
+              out.push cur
+              cur = char
+              mode = (mode == :char ? :space : :char)
+            else
+              # same mode
+              cur += char
+            end
           end
         end
       end
       
       out.push(cur)
-      out.delete '' 
-      out.map {|elt| newline?(elt) ? elt : elt.chomp}
+      out.delete ''
+      out
+#      out.map {|elt| newline?(elt) ? elt : elt.chomp}
     end
   end
 
@@ -392,44 +407,32 @@ module HTMLDiff
     
       # Using this as op_helper would be equivalent to the first version of diff.rb by Bill Atkins
       def op_helper_simple(tagname, tagclass, to_add)
-        @content << %(<#{tagname} class="#{tagclass}">) << to_add << %(</#{tagname}>)
+        @content << wrap_text(to_add, tagname, tagclass)
       end
       
-      # Tries to put <p> tags or newline chars before the opening diff tags (<ins> or <del>)
-      # or after the ending diff tags.
-      # As a result the diff tags should be the "most inside" possible.
+      # All other tags outside diff tags (<ins> or <del>)
       def op_helper(tagname, tagclass, to_add)
-        predicate_methods = [:tab?, :newline?, :close_tag?, :open_tag?]
-        content_to_skip   = Proc.new do |item| 
-          predicate_methods.any? {|predicate| HTMLDiff.send(predicate, item)}
-        end
-
-        unless to_add.any? {|element| content_to_skip.call element}
-          @content << wrap_text(to_add, tagname, tagclass)
-        else
-          loop do
-            @content << to_add and break if to_add.all? {|element| content_to_skip.call element}
-            # We are outside of a diff tag
-            @content << to_add.shift while content_to_skip.call to_add.first 
-            @content << %(<#{tagname} class="#{tagclass}">) 
-            # We are inside a diff tag
-            @content << to_add.shift until content_to_skip.call to_add.first
-            @content << %(</#{tagname}>)
+        @content << wrap_start(tagname, tagclass)
+        to_add.each do |item|
+          if HTMLDiff.open_tag?(item) or HTMLDiff.close_tag?(item)
+            @content << wrap_end(tagname) << item << wrap_start(tagname, tagclass)
+          else
+            @content << item
           end
         end
-        #remove_empty_diff(tagname, tagclass)
+        @content << wrap_end(tagname)
       end
 
       def wrap_text(text, tagname, tagclass)
-        %(<#{tagname} class="#{tagclass}">#{text}</#{tagname}>)
+        wrap_start(tagname, tagclass) + text + wrap_end(tagname)
       end
 
-      def remove_empty_diff(tagname, tagclass)
-        @content = @content[0...-2] if last_elements_empty_diff?(@content, tagname, tagclass)
+      def wrap_start(tagname, tagclass)
+        "<#{tagname} class=\"#{tagclass}\">"
       end
 
-      def last_elements_empty_diff?(content, tagname, tagclass)
-        content[-2] == %(<#{tagname} class="#{tagclass}">) and content.last == %(</#{tagname}>)
+      def wrap_end(tagname)
+        "</#{tagname}>"
       end
   end
   
@@ -438,11 +441,13 @@ module HTMLDiff
 
     def diff(a, b)
       a, b = html2list(explode(a)), html2list(explode(b))
-
       out              = Builder.new(a, b)
       sequence_matcher = Diff::SequenceMatcher.new(a, b)
 
-      sequence_matcher.get_opcodes.each {|opcode| out.do_op(opcode)}
+      ops = sequence_matcher.get_opcodes
+      ops.each do |opcode| 
+        out.do_op(opcode) 
+      end
 
       out.result 
     end
