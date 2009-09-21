@@ -28,6 +28,14 @@
 # ** small fix to html2list
 #
 
+# changes by Tero Tilus
+# * #html2list is now reversible operation
+#   always text == html2list(text).join('')
+#   this way differ doesn't screw <pre> blocks
+# * make #html2list more fine grained
+# * #op_helper now includes whitespace to diffs and leaves all tags out 
+#   of them to avoid tag soup problem
+
 module Enumerable
   def reduce(init)
     result = init
