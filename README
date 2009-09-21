@@ -5,7 +5,6 @@ Compact Rails WebApp to inspect various issues of GitHub Wiki pages.  Grab it, f
 * Handle homepages
   http://wiki.github.com/foo/bar/home redirects to /foo/bar and
   versions select list has /foo/bar/wikis/home
-* Temporal (next, prev) diff navigation
 * Move page handling to a model
 * Cache
 ** loaded page contents

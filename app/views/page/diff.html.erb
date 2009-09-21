@@ -4,9 +4,20 @@
   <%= @page_versions_select %>
   <%= submit_tag "Show changes" %>
   <% end %>
-  Showing diff from <%= @v2 %> to <%= @v1==0 ? "current" : @v1 %> |
+  Showing version <%= @v2 %> &rarr; <%= @v1==0 ? "current" : "version #{@v1}" %> |
+  <% if @v1 == @page_max_version %>
+    <%= link_to "prev", :versions_select => @v2 %> |
+    next |
+  <% elsif @v1 == 1 %>
+    prev |
+    <%= link_to "next", :versions_select => @v1+1 %> |
+  <% else %>
+    <%= link_to "prev", :versions_select => @v2 %> |
+    <%= link_to "next", :versions_select => (@v1==@page_max_version ? 0 : @v1+1) %> |
+  <% end %>
   <%= link_to "Show current version", :version=>nil, :action=>:show %> |
-  <%= link_to "Dashboard", root_url %>
+  <%= link_to "Dashboard", root_url %> |
+  Wiki actions: ( <%= @page_actions %> )
 </div>
 
 <div id="pageview">

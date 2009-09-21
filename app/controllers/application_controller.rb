@@ -13,9 +13,19 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # opts[:version].nil?  -> fetch most recent version
+  # opts[:version] == -1 -> fetch most recent version
   def github_wikipage_url(opts)
+    ver = case opts[:version]
+          when nil, -1:
+              nil
+          when Integer:
+              opts[:version]
+          else
+            raise "Invalid version: #{opts[:version].inspect}."
+          end
     "#{WIKIROOT}#{opts[:user]}/#{opts[:repo]}/#{opts[:page]}" + 
-      (opts[:version] ? "/#{opts[:version]}" : "")
+      (ver ? "/#{ver}" : "")
   end
 
   def github_wikipage_edit_url(opts)
