@@ -50,7 +50,7 @@ class PageController < ApplicationController
     @page ||= Hash.new
     version = normalize_version(version)
     return @page[0] ||= Hpricot(EMPTY) if version == 0
-    @page[version] ||= 
+    @page[version] ||=
       Hpricot(Net::HTTP.get_response(URI.parse(page_url(version))).body)
   end
 
@@ -87,7 +87,7 @@ class PageController < ApplicationController
         # Iterate options and replace url with version number.  Most
         # recent version doesn't have its version number in its url, so
         # it has to be fixed later or.
-        ver = begin 
+        ver = begin
                 e['value'].match('([0-9]+)$')[0].to_i
               rescue
                 fix = e
@@ -96,15 +96,15 @@ class PageController < ApplicationController
         e['value'] = ver.to_s
       end
       # Set most recent version num to (max of all the others)+1
-      fix['value'] = elem.children.map { |e| e['value'].to_i }.max + 1
+      fix['value'] = (elem.children.map { |e| e['value'].to_i }.max + 1).to_s
       @page_versions_select_elem = elem
     end
     html ? @page_versions_select_elem.to_html : @page_versions_select_elem
   end
 
   def fetch_page_max_version
-    fetch_page_versions_select(false).children.map do |s| 
-      s['value'].to_i rescue 0 
+    fetch_page_versions_select(false).children.map do |s|
+      s['value'].to_i rescue 0
     end.max
   end
 end
